@@ -2,20 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/toggleBackground"
-        android:title="@string/toggleBackground"
+    <item android:id="@+id/enableBackground"
+        android:title="@string/enableBackground"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/disableBackground"
+        android:title="@string/disableBackground"
         app:showAsAction="never" />
 
     <item android:id="@+id/toggleButtonColor"
         android:title="@string/toggleButtonColor"
         app:showAsAction="never" />
 
-    <item android:id="@+id/toggleMenu"
-        android:title="@string/toggleMenu"
+    <item android:id="@+id/openMenu"
+        android:title="@string/openMenu"
         app:showAsAction="never" />
 
-    <item android:id="@+id/toggleHand"
-        android:title="@string/toggleHand"
+    <item android:id="@+id/closeMenu"
+        android:title="@string/closeMenu"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/setLeftHanded"
+        android:title="@string/setLeftHanded"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/setRightHanded"
+        android:title="@string/setRightHanded"
         app:showAsAction="never" />
 
 </menu>

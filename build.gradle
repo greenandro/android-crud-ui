@@ -1,11 +1,15 @@
 buildscript {
+    ext.kotlin_version = '1.0.6'
+    ext.android_support_version = '25.1.1'
+    ext.anko_version = '0.9.1'
     repositories {
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
-        classpath "com.github.dcendents:android-maven-gradle-plugin:1.4.1"
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -15,10 +19,6 @@ allprojects {
         mavenLocal()
         maven {url "https://clojars.org/repo/"}
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
 
 apply plugin: JavadocAggregationPlugin

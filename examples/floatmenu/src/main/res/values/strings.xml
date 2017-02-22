@@ -7,4 +7,10 @@
     <string name="click_me">Click Me</string>
     <string name="toggleMenu">Toggle menu</string>
     <string name="toggleHand">Toggle left/right hand</string>
+    <string name="enableBackground">Enable background</string>
+    <string name="disableBackground">Disable background</string>
+    <string name="setLeftHanded">Set left handed</string>
+    <string name="setRightHanded">Set right handed</string>
+    <string name="openMenu">Open menu</string>
+    <string name="closeMenu">Close menu</string>
 </resources>

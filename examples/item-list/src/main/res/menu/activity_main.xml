@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menuPane xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/clear"
@@ -30,4 +30,4 @@
         android:title="@string/move_down"
         app:showAsAction="never" />
 
-</menu>
+</menuPane>
