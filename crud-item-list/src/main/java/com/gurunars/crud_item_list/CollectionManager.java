@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import java8.util.function.BiFunction;
 import java8.util.function.Consumer;
 
 
@@ -23,15 +22,11 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     private List<ItemHolder<ItemType>> items = new ArrayList<>();
     private Set<ItemHolder<ItemType>> selectedItems = new HashSet<>();
 
-    private final MoverUp<ItemHolder<ItemType>> moverUp = new MoverUp<>();
-    private final MoverDown<ItemHolder<ItemType>> moverDown = new MoverDown<>();
-    private final Deleter<ItemHolder<ItemType>> deleter = new Deleter<>();
-
-    private final CheckerMoveDown<ItemHolder<ItemType>> checkerMoveDown = new CheckerMoveDown<>();
-    private final CheckerMoveUp<ItemHolder<ItemType>> checkerMoveUp = new CheckerMoveUp<>();
-    private final CheckerSelectAll<ItemHolder<ItemType>> checkerSelectAll = new CheckerSelectAll<>();
-    private final CheckerDelete<ItemHolder<ItemType>> checkerDelete = new CheckerDelete<>();
-    private final CheckerEdit<ItemHolder<ItemType>> checkerEdit = new CheckerEdit<>();
+    private final ActionDelete<ItemHolder<ItemType>> actionDelete = new ActionDelete<>();
+    private final ActionEdit<ItemHolder<ItemType>> actionEdit = new ActionEdit<>();
+    private final ActionMoveUp<ItemHolder<ItemType>> actionMoveUp = new ActionMoveUp<>();
+    private final ActionMoveDown<ItemHolder<ItemType>> actionMoveDown = new ActionMoveDown<>();
+    private final ActionSelectAll<ItemHolder<ItemType>> actionSelectAll = new ActionSelectAll<>();
 
     private final Consumer<List<SelectableItem<ItemType>>> stateChangeHandler;
     private final Consumer<List<ItemType>> collectionChangeHandler;
@@ -58,23 +53,23 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     }
 
     boolean canEdit() {
-        return checkerEdit.apply(items, selectedItems);
+        return actionEdit.canPerform(items, selectedItems);
     }
 
     boolean canMoveUp() {
-        return checkerMoveUp.apply(items, selectedItems);
+        return actionMoveUp.canPerform(items, selectedItems);
     }
 
     boolean canMoveDown() {
-        return checkerMoveDown.apply(items, selectedItems);
+        return actionMoveDown.canPerform(items, selectedItems);
     }
 
     boolean canDelete() {
-        return checkerDelete.apply(items, selectedItems);
+        return actionDelete.canPerform(items, selectedItems);
     }
 
     boolean canSelectAll() {
-        return checkerSelectAll.apply(items, selectedItems);
+        return actionSelectAll.canPerform(items, selectedItems);
     }
 
     private void cleanSelection() {
@@ -130,22 +125,22 @@ class CollectionManager<ItemType extends Item> implements Serializable {
         changed();
     }
 
-    private void changeDataSet(BiFunction<List<ItemHolder<ItemType>>, Set<ItemHolder<ItemType>>, List<ItemHolder<ItemType>>> changer) {
-        items = changer.apply(items, selectedItems);
+    private void changeDataSet(Action<ItemHolder<ItemType>> action) {
+        action.perform(items, selectedItems);
         changed();
         collectionChangeHandler.accept(ItemHolder.unwrap(items));
     }
 
     void deleteSelected() {
-        changeDataSet(deleter);
+        changeDataSet(actionDelete);
     }
 
     void moveSelectionUp() {
-        changeDataSet(moverUp);
+        changeDataSet(actionMoveUp);
     }
 
     void moveSelectionDown() {
-        changeDataSet(moverDown);
+        changeDataSet(actionMoveDown);
     }
 
     void selectAll() {
