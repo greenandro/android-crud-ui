@@ -1,10 +1,6 @@
 package com.gurunars.crud_item_list;
 
-import android.view.Menu;
-import android.view.MenuItem;
-
 import com.esotericsoftware.kryo.Kryo;
-import com.gurunars.item_list.Item;
 
 import java.util.Iterator;
 import java.util.List;
