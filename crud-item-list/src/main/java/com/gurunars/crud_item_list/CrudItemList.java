@@ -8,8 +8,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.RelativeLayout;
 
 import com.gurunars.floatmenu.AnimationListener;
@@ -47,7 +45,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
     private final ScheduledRunner scheduledRunner = new ScheduledRunner();
 
     private final ViewGroup creationMenuPlaceholder;
-    private final ViewGroup formPlaceholder;
     private final ContextualMenu contextualMenu;
 
     private final FloatMenu floatingMenu;
@@ -79,7 +76,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
         contextualMenu = ButterKnife.findById(this, R.id.contextualMenu);
         creationMenuPlaceholder = ButterKnife.findById(this, R.id.creationMenuPlaceholder);
         itemList = ButterKnife.findById(this, R.id.itemList);
-        formPlaceholder = ButterKnife.findById(this, R.id.formPlaceholder);
 
         collectionManager = new CollectionManager<>(new Consumer<List<SelectableItem<ItemType>>>() {
             @Override
@@ -274,28 +270,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
      */
     public void close() {
         floatingMenu.close();
-
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setDuration(ANIMATION_DURATION);
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                formPlaceholder.removeAllViews();
-                formPlaceholder.setVisibility(GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        formPlaceholder.startAnimation(fadeOut);
-
     }
 
     private void onItemEdit(ItemType editableItem, boolean isNew) {
