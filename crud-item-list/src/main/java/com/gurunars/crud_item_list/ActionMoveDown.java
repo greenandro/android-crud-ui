@@ -15,7 +15,7 @@ final class ActionMoveDown<ItemType> implements Action<ItemType> {
             new CheckerSolidChunk();
 
     @Override
-    public void perform(List<ItemType> all, Set<ItemType> selectedItems) {
+    public void perform(final List<ItemType> all, final Set<ItemType> selectedItems) {
         if (!canPerform(all, selectedItems)) {
             return;
         }

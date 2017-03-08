@@ -1,5 +1,8 @@
 package com.gurunars.crud_item_list;
 
+import android.support.annotation.IdRes;
+import android.view.View;
+
 import com.esotericsoftware.kryo.Kryo;
 import com.gurunars.item_list.Item;
 
@@ -7,11 +10,13 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import butterknife.ButterKnife;
 import java8.util.function.Consumer;
 
 
@@ -22,22 +27,28 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     private List<ItemHolder<ItemType>> items = new ArrayList<>();
     private Set<ItemHolder<ItemType>> selectedItems = new HashSet<>();
 
-    private final ActionDelete<ItemHolder<ItemType>> actionDelete = new ActionDelete<>();
-    private final ActionEdit<ItemHolder<ItemType>> actionEdit = new ActionEdit<>();
-    private final ActionMoveUp<ItemHolder<ItemType>> actionMoveUp = new ActionMoveUp<>();
-    private final ActionMoveDown<ItemHolder<ItemType>> actionMoveDown = new ActionMoveDown<>();
-    private final ActionSelectAll<ItemHolder<ItemType>> actionSelectAll = new ActionSelectAll<>();
-
     private final Consumer<List<SelectableItem<ItemType>>> stateChangeHandler;
     private final Consumer<List<ItemType>> collectionChangeHandler;
-    private Consumer<ItemType> itemConsumer;
+    private View contextualMenu;
+
+    private final ActionEdit<ItemHolder<ItemType>> actionEdit = new ActionEdit<>();
+
+    private final Map<View, Action<ItemHolder<ItemType>>> actions = new HashMap<>();
 
     CollectionManager(
+            View contextualMenu,
             Consumer<List<SelectableItem<ItemType>>> stateChangeHandler,
             Consumer<List<ItemType>> collectionChangeHandler) {
+        this.contextualMenu = contextualMenu;
         this.stateChangeHandler = stateChangeHandler;
         this.collectionChangeHandler = collectionChangeHandler;
         this.kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+
+        registerAction(R.id.selectAll, new ActionSelectAll<ItemHolder<ItemType>>());
+        registerAction(R.id.delete, new ActionDelete<ItemHolder<ItemType>>());
+        registerAction(R.id.edit, actionEdit);
+        registerAction(R.id.moveUp, new ActionMoveUp<ItemHolder<ItemType>>());
+        registerAction(R.id.moveDown, new ActionMoveDown<ItemHolder<ItemType>>());
     }
 
     private List<SelectableItem<ItemType>> getSelectableItems() {
@@ -48,28 +59,26 @@ class CollectionManager<ItemType extends Item> implements Serializable {
         return rval;
     }
 
+    void registerAction(@IdRes int itemId, final Action<ItemHolder<ItemType>> action) {
+        View itemView = ButterKnife.findById(contextualMenu, itemId);
+        this.actions.put(itemView, action);
+        itemView.setEnabled(action.canPerform(items, selectedItems));
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!action.canPerform(items, selectedItems)) {
+                    return;
+                }
+                action.perform(items, selectedItems);
+                changed();
+                collectionChangeHandler.accept(ItemHolder.unwrap(items));
+                v.setEnabled(action.canPerform(items, selectedItems));
+            }
+        });
+    }
+
     boolean hasSelection() {
         return !selectedItems.isEmpty();
-    }
-
-    boolean canEdit() {
-        return actionEdit.canPerform(items, selectedItems);
-    }
-
-    boolean canMoveUp() {
-        return actionMoveUp.canPerform(items, selectedItems);
-    }
-
-    boolean canMoveDown() {
-        return actionMoveDown.canPerform(items, selectedItems);
-    }
-
-    boolean canDelete() {
-        return actionDelete.canPerform(items, selectedItems);
-    }
-
-    boolean canSelectAll() {
-        return actionSelectAll.canPerform(items, selectedItems);
     }
 
     private void cleanSelection() {
@@ -87,6 +96,9 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     private void changed() {
         cleanSelection();
         stateChangeHandler.accept(getSelectableItems());
+        for (Map.Entry<View, Action<ItemHolder<ItemType>>> entry: actions.entrySet()) {
+            entry.getKey().setEnabled(entry.getValue().canPerform(items, selectedItems));
+        }
     }
 
     void itemClick(ItemType item) {
@@ -111,8 +123,13 @@ class CollectionManager<ItemType extends Item> implements Serializable {
         changed();
     }
 
-    void setItemConsumer(Consumer<ItemType> itemConsumer) {
-        this.itemConsumer = itemConsumer;
+    void setItemConsumer(final Consumer<ItemType> itemConsumer) {
+        this.actionEdit.setItemConsumer(new Consumer<ItemHolder<ItemType>>() {
+            @Override
+            public void accept(ItemHolder<ItemType> holder) {
+                itemConsumer.accept(holder.getRaw());
+            }
+        });
     }
 
     void unselectAll() {
@@ -123,40 +140,6 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     void setItems(List<ItemType> items) {
         this.items = kryo.copy(new ArrayList<>(ItemHolder.wrap(items)));
         changed();
-    }
-
-    private void changeDataSet(Action<ItemHolder<ItemType>> action) {
-        action.perform(items, selectedItems);
-        changed();
-        collectionChangeHandler.accept(ItemHolder.unwrap(items));
-    }
-
-    void deleteSelected() {
-        changeDataSet(actionDelete);
-    }
-
-    void moveSelectionUp() {
-        changeDataSet(actionMoveUp);
-    }
-
-    void moveSelectionDown() {
-        changeDataSet(actionMoveDown);
-    }
-
-    void selectAll() {
-        selectedItems.addAll(items);
-        changed();
-    }
-
-    void triggerConsumption() {
-        if (itemConsumer == null) {
-            return;
-        }
-
-        Iterator<ItemHolder<ItemType>> iterator = selectedItems.iterator();
-        if (iterator.hasNext()) {
-            itemConsumer.accept(kryo.copy(iterator.next().getRaw()));
-        }
     }
 
     Serializable saveState() {

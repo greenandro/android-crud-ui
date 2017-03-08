@@ -42,7 +42,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
     private final CollectionManager<ItemType> collectionManager;
 
     private final UiThrottleBuffer throttleBuffer = new UiThrottleBuffer();
-    private final ScheduledRunner scheduledRunner = new ScheduledRunner();
 
     private final ViewGroup creationMenuPlaceholder;
     private final ContextualMenu contextualMenu;
@@ -77,18 +76,13 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
         creationMenuPlaceholder = ButterKnife.findById(this, R.id.creationMenuPlaceholder);
         itemList = ButterKnife.findById(this, R.id.itemList);
 
-        collectionManager = new CollectionManager<>(new Consumer<List<SelectableItem<ItemType>>>() {
+        collectionManager = new CollectionManager<>(contextualMenu,
+        new Consumer<List<SelectableItem<ItemType>>>() {
             @Override
             public void accept(final List<SelectableItem<ItemType>> selectableItems) {
                 itemList.setItems(selectableItems);
                 if (collectionManager.hasSelection()) {
                     setUpContextualMenu();
-                    contextualMenu.setUpContextualButtons(
-                            collectionManager.canEdit(),
-                            collectionManager.canMoveUp(),
-                            collectionManager.canMoveDown(),
-                            collectionManager.canDelete(),
-                            collectionManager.canSelectAll());
                     floatingMenu.open();
                 } else {
                     floatingMenu.close();
@@ -129,7 +123,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
             @Override
             public void onStart(int projectedDuration) {
                 if (collectionManager.hasSelection()) {
-                    scheduledRunner.stop();
                     collectionManager.unselectAll();
                 }
             }
@@ -137,51 +130,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
             @Override
             public void onFinish() {
                 setUpCreationMenu();
-            }
-        });
-
-        contextualMenu.setMenuListener(new ContextualMenu.MenuListener() {
-            @Override
-            public void delete() {
-                collectionManager.deleteSelected();
-            }
-
-            @Override
-            public void edit() {
-                collectionManager.triggerConsumption();
-            }
-
-            @Override
-            public void moveUp(boolean isActive) {
-                if (isActive) {
-                    scheduledRunner.start(new Runnable() {
-                        @Override
-                        public void run() {
-                            collectionManager.moveSelectionUp();
-                        }
-                    });
-                } else {
-                    scheduledRunner.stop();
-                }
-            }
-
-            @Override
-            public void moveDown(boolean isActive) {
-                if (isActive) {
-                    scheduledRunner.start(new Runnable() {
-                        @Override
-                        public void run() {
-                            collectionManager.moveSelectionDown();
-                        }
-                    });
-                } else {
-                    scheduledRunner.stop();
-                }
-            }
-
-            @Override
-            public void selectAll() {
-                collectionManager.selectAll();
             }
         });
 
