@@ -5,11 +5,13 @@ import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import icepick.Icepick;
 import icepick.State;

@@ -16,7 +16,9 @@ import com.gurunars.item_list.EmptyViewBinder;
 import com.gurunars.item_list.Item;
 import com.gurunars.item_list.ItemList;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import icepick.Icepick;
@@ -49,6 +51,8 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
     private final FloatMenu floatingMenu;
     private final ItemList<SelectableItem<ItemType>> itemList;
 
+    private ActionEdit<ItemHolder<ItemType>> actionEdit = new ActionEdit<>();
+
     private ListChangeListener<ItemType> listChangeListener =
             new ListChangeListener.DefaultListChangeListener<>();
     private ItemEditListener<ItemType> itemEditListener =
@@ -76,7 +80,18 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
         creationMenuPlaceholder = ButterKnife.findById(this, R.id.creationMenuPlaceholder);
         itemList = ButterKnife.findById(this, R.id.itemList);
 
-        collectionManager = new CollectionManager<>(contextualMenu,
+        Map<Integer, Action<ItemHolder<ItemType>>> actions =
+                new HashMap<Integer, Action<ItemHolder<ItemType>>>() {{
+            put(R.id.selectAll, new ActionSelectAll<ItemHolder<ItemType>>());
+            put(R.id.delete, new ActionDelete<ItemHolder<ItemType>>());
+            put(R.id.edit, actionEdit);
+            put(R.id.moveUp, new ActionMoveUp<ItemHolder<ItemType>>());
+            put(R.id.moveDown, new ActionMoveDown<ItemHolder<ItemType>>());
+        }};
+
+
+        collectionManager = new CollectionManager<>(
+                contextualMenu, actions,
         new Consumer<List<SelectableItem<ItemType>>>() {
             @Override
             public void accept(final List<SelectableItem<ItemType>> selectableItems) {
@@ -130,13 +145,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
             @Override
             public void onFinish() {
                 setUpCreationMenu();
-            }
-        });
-
-        collectionManager.setItemConsumer(new Consumer<ItemType>() {
-            @Override
-            public void accept(ItemType item) {
-                onItemEdit(item, false);
             }
         });
 
@@ -220,10 +228,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
         floatingMenu.close();
     }
 
-    private void onItemEdit(ItemType editableItem, boolean isNew) {
-        itemEditListener.onEdit(editableItem, isNew);
-    }
-
     /**
      * Map item type to view binder responsible for rending items of this type.
      *
@@ -246,7 +250,7 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
                     new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onItemEdit(newItemSupplier.supply(), true);
+                            itemEditListener.onEdit(newItemSupplier.supply(), true);
                         }
                     });
         }
@@ -329,7 +333,13 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
      * @param itemEditListener a listener for the cases when a new item has to be created or when
      *                         the existing one has to be edited
      */
-    public void setItemEditListener(ItemEditListener<ItemType> itemEditListener) {
+    public void setItemEditListener(final ItemEditListener<ItemType> itemEditListener) {
         this.itemEditListener = itemEditListener;
+        this.actionEdit.setItemConsumer(new Consumer<ItemHolder<ItemType>>() {
+            @Override
+            public void accept(ItemHolder<ItemType> holder) {
+                itemEditListener.onEdit(holder.getRaw(), false);
+            }
+        });
     }
 }

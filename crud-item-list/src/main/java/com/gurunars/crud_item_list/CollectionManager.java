@@ -31,12 +31,11 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     private final Consumer<List<ItemType>> collectionChangeHandler;
     private View contextualMenu;
 
-    private final ActionEdit<ItemHolder<ItemType>> actionEdit = new ActionEdit<>();
-
     private final Map<View, Action<ItemHolder<ItemType>>> actions = new HashMap<>();
 
     CollectionManager(
-            View contextualMenu,
+            ContextualMenu contextualMenu,
+            Map<Integer, Action<ItemHolder<ItemType>>> actions,
             Consumer<List<SelectableItem<ItemType>>> stateChangeHandler,
             Consumer<List<ItemType>> collectionChangeHandler) {
         this.contextualMenu = contextualMenu;
@@ -44,11 +43,9 @@ class CollectionManager<ItemType extends Item> implements Serializable {
         this.collectionChangeHandler = collectionChangeHandler;
         this.kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 
-        registerAction(R.id.selectAll, new ActionSelectAll<ItemHolder<ItemType>>());
-        registerAction(R.id.delete, new ActionDelete<ItemHolder<ItemType>>());
-        registerAction(R.id.edit, actionEdit);
-        registerAction(R.id.moveUp, new ActionMoveUp<ItemHolder<ItemType>>());
-        registerAction(R.id.moveDown, new ActionMoveDown<ItemHolder<ItemType>>());
+        for (Map.Entry<Integer, Action<ItemHolder<ItemType>>> entry: actions.entrySet()){
+            registerAction(entry.getKey(), entry.getValue());
+        }
     }
 
     private List<SelectableItem<ItemType>> getSelectableItems() {
@@ -59,7 +56,7 @@ class CollectionManager<ItemType extends Item> implements Serializable {
         return rval;
     }
 
-    void registerAction(@IdRes int itemId, final Action<ItemHolder<ItemType>> action) {
+    private void registerAction(@IdRes int itemId, final Action<ItemHolder<ItemType>> action) {
         View itemView = ButterKnife.findById(contextualMenu, itemId);
         this.actions.put(itemView, action);
         itemView.setEnabled(action.canPerform(items, selectedItems));
@@ -121,15 +118,6 @@ class CollectionManager<ItemType extends Item> implements Serializable {
             selectedItems.add(new ItemHolder<>(item));
         }
         changed();
-    }
-
-    void setItemConsumer(final Consumer<ItemType> itemConsumer) {
-        this.actionEdit.setItemConsumer(new Consumer<ItemHolder<ItemType>>() {
-            @Override
-            public void accept(ItemHolder<ItemType> holder) {
-                itemConsumer.accept(holder.getRaw());
-            }
-        });
     }
 
     void unselectAll() {
