@@ -7,24 +7,14 @@ import java.io.Serializable;
  *
  * "equals" method MUST be implemented to compare items subclasses by value.
  */
-public class Item<PayloadType extends Serializable> implements Serializable {
+public final class Item<PayloadType extends Payload> implements Serializable {
 
-    private final Enum type;
     private final long id;
-    private PayloadType payload;
+    private final PayloadType payload;
 
-    public Item(Enum type, long id, PayloadType payload) {
-        this.type = type;
+    public Item(long id, PayloadType payload) {
         this.id = id;
         this.payload = payload;
-    }
-
-    /**
-     * @return value to be used when deciding which view to use to render the items in a
-     *         RecyclerView
-     */
-    public final Enum getType() {
-        return type;
     }
 
     /**
@@ -36,10 +26,6 @@ public class Item<PayloadType extends Serializable> implements Serializable {
 
     public final PayloadType getPayload() {
         return payload;
-    }
-
-    public final void setPayload(PayloadType payload) {
-        this.payload = payload;
     }
 
     @Override

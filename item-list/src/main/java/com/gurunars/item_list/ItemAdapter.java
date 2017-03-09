@@ -106,7 +106,7 @@ class ItemAdapter<ItemType extends Item> extends RecyclerView.Adapter<BindableVi
         if (position == items.size()) {
             return ItemViewBinderFooter.FOOTER_TYPE;
         }
-        return items.get(position).getType().ordinal();
+        return items.get(position).getPayload().getType().ordinal();
     }
 
     @Override

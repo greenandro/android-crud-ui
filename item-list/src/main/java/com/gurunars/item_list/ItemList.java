@@ -12,11 +12,11 @@ import butterknife.ButterKnife;
 
 /**
  *
- * @param <ItemType> subclass of the Item instances of which are used to populate the views
+ * @param <PayloadType> Item payload
  */
-public class ItemList<ItemType extends Item> extends FrameLayout {
+public class ItemList<PayloadType extends Payload> extends FrameLayout {
 
-    private ItemAdapter<ItemType> itemAdapter;
+    private ItemAdapter<Item<PayloadType>> itemAdapter;
     private LinearLayoutManager layoutManager;
 
     public ItemList(Context context) {
@@ -64,7 +64,7 @@ public class ItemList<ItemType extends Item> extends FrameLayout {
      *
      * @param items a new collection to be shown
      */
-    public void setItems(List<ItemType> items) {
+    public void setItems(List<Item<PayloadType>> items) {
         itemAdapter.setItems(items);
     }
 
@@ -74,7 +74,7 @@ public class ItemList<ItemType extends Item> extends FrameLayout {
      * @param itemType type of the Item
      * @param itemViewBinder renderer for the items of a given type
      */
-    public void registerItemViewBinder(Enum itemType, ItemViewBinder<ItemType> itemViewBinder) {
+    public void registerItemViewBinder(Enum itemType, ItemViewBinder<Item<PayloadType>> itemViewBinder) {
         itemAdapter.registerItemViewBinder(itemType, itemViewBinder);
     }
 
