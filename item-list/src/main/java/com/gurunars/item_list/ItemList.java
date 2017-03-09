@@ -30,7 +30,7 @@ public class ItemList<ItemType extends Item> extends FrameLayout {
     public ItemList(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        inflate(context, R.layout.item_list_view, this);
+        inflate(context, R.layout.item_list, this);
 
         RecyclerView recyclerView = ButterKnife.findById(this, R.id.recyclerView);
         layoutManager = new LinearLayoutManager(context);
