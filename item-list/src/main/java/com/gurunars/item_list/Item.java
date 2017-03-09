@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * "equals" method MUST be implemented to compare items subclasses by value.
  */
-public abstract class Item<PayloadType extends Serializable> implements Serializable {
+public class Item<PayloadType extends Serializable> implements Serializable {
 
     private final Enum type;
     private final long id;
