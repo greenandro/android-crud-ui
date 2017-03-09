@@ -13,18 +13,18 @@ public class FetcherComplexPermutationTest {
     @Test
     public void getNormal() {
         assertEquals(fetcher.apply(
-                ItemHolder.wrap(Arrays.asList(
+                Arrays.asList(
                         new TestItem(1, 1),
                         new TestItem(2, 1),
                         new TestItem(3, 1),
+                        new TestItem(4, 1)
+                ),
+                Arrays.asList(
+                        new TestItem(1, 1),
+                        new TestItem(3, 1),
+                        new TestItem(2, 1),
                         new TestItem(4, 1)
                 )),
-                ItemHolder.wrap(Arrays.asList(
-                        new TestItem(1, 1),
-                        new TestItem(3, 1),
-                        new TestItem(2, 1),
-                        new TestItem(4, 1)
-                ))),
                 new ChangeComplexPermutation<>(1, Arrays.asList(
                         new TestItem(3, 1),
                         new TestItem(2, 1)
