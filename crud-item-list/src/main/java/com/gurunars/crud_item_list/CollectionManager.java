@@ -34,7 +34,7 @@ class CollectionManager<ItemType extends Item> implements Serializable {
     private final Map<View, Action<ItemHolder<ItemType>>> actions = new HashMap<>();
 
     CollectionManager(
-            ContextualMenu contextualMenu,
+            View contextualMenu,
             Map<Integer, Action<ItemHolder<ItemType>>> actions,
             Consumer<List<SelectableItem<ItemType>>> stateChangeHandler,
             Consumer<List<ItemType>> collectionChangeHandler) {

@@ -41,12 +41,11 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
     @State int openBgColor;
     @State int openFgColor;
 
-    private final CollectionManager<ItemType> collectionManager;
+    private View contextualMenu;
+    private CollectionManager<ItemType> collectionManager;
 
     private final UiThrottleBuffer throttleBuffer = new UiThrottleBuffer();
-
     private final ViewGroup creationMenuPlaceholder;
-    private final ContextualMenu contextualMenu;
 
     private final FloatMenu floatingMenu;
     private final ItemList<SelectableItem<ItemType>> itemList;
@@ -73,47 +72,19 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
 
         floatingMenu = ButterKnife.findById(this, R.id.floatingMenu);
         floatingMenu.setAnimationDuration(ANIMATION_DURATION);
-        floatingMenu.setMenuView(inflate(context, R.layout.raw_menu_layout, null));
         floatingMenu.setContentView(inflate(context, R.layout.raw_item_list, null));
 
-        contextualMenu = ButterKnife.findById(this, R.id.contextualMenu);
         creationMenuPlaceholder = ButterKnife.findById(this, R.id.creationMenuPlaceholder);
         itemList = ButterKnife.findById(this, R.id.itemList);
 
-        Map<Integer, Action<ItemHolder<ItemType>>> actions =
+        setContextualMenu(inflate(context, R.layout.raw_menu_layout, null),
                 new HashMap<Integer, Action<ItemHolder<ItemType>>>() {{
             put(R.id.selectAll, new ActionSelectAll<ItemHolder<ItemType>>());
             put(R.id.delete, new ActionDelete<ItemHolder<ItemType>>());
             put(R.id.edit, actionEdit);
             put(R.id.moveUp, new ActionMoveUp<ItemHolder<ItemType>>());
             put(R.id.moveDown, new ActionMoveDown<ItemHolder<ItemType>>());
-        }};
-
-
-        collectionManager = new CollectionManager<>(
-                contextualMenu, actions,
-        new Consumer<List<SelectableItem<ItemType>>>() {
-            @Override
-            public void accept(final List<SelectableItem<ItemType>> selectableItems) {
-                itemList.setItems(selectableItems);
-                if (collectionManager.hasSelection()) {
-                    setUpContextualMenu();
-                    floatingMenu.open();
-                } else {
-                    floatingMenu.close();
-                }
-            }
-        }, new Consumer<List<ItemType>>() {
-            @Override
-            public void accept(final List<ItemType> items) {
-                throttleBuffer.call(new Runnable() {
-                    @Override
-                    public void run() {
-                    listChangeListener.onChange(items);
-                    }
-                });
-            }
-        });
+        }});
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CrudItemList);
 
@@ -132,7 +103,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
         a.recycle();
 
         setLeftHanded(false);
-        setSortable(true);
 
         floatingMenu.setOnCloseListener(new AnimationListener() {
             @Override
@@ -151,11 +121,38 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
         setUpColors();
     }
 
+    public void setContextualMenu(View contextualMenu, Map<Integer, Action<ItemHolder<ItemType>>> actions) {
+        floatingMenu.setMenuView(contextualMenu);
+        collectionManager = new CollectionManager<>(
+                contextualMenu, actions,
+                new Consumer<List<SelectableItem<ItemType>>>() {
+                    @Override
+                    public void accept(final List<SelectableItem<ItemType>> selectableItems) {
+                        itemList.setItems(selectableItems);
+                        if (collectionManager.hasSelection()) {
+                            setUpContextualMenu();
+                            floatingMenu.open();
+                        } else {
+                            floatingMenu.close();
+                        }
+                    }
+                }, new Consumer<List<ItemType>>() {
+            @Override
+            public void accept(final List<ItemType> items) {
+                throttleBuffer.call(new Runnable() {
+                    @Override
+                    public void run() {
+                        listChangeListener.onChange(items);
+                    }
+                });
+            }
+        });
+
+    }
+
     private void setUpColors() {
         floatingMenu.setOpenIconBgColor(openBgColor);
         floatingMenu.setOpenIconFgColor(openFgColor);
-        contextualMenu.setIconBgColor(actionIconBgColor);
-        contextualMenu.setIconFgColor(actionIconFgColor);
         if (collectionManager.hasSelection()) {
             setUpContextualMenu();
         } else {
@@ -168,7 +165,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
      */
     public void setLeftHanded(boolean leftHanded) {
         floatingMenu.setLeftHanded(leftHanded);
-        contextualMenu.setLeftHanded(leftHanded);
     }
 
     private void setUpContextualMenu() {
@@ -263,13 +259,6 @@ public class CrudItemList<ItemType extends Item> extends RelativeLayout {
      */
     public void setEmptyViewBinder(EmptyViewBinder emptyViewBinder) {
         itemList.setEmptyViewBinder(emptyViewBinder);
-    }
-
-    /**
-     * @param sortable if false - move up and down buttons are disabled
-     */
-    public void setSortable(boolean sortable) {
-        contextualMenu.setSortable(sortable);
     }
 
     /**
