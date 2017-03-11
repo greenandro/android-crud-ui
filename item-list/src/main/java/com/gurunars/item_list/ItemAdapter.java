@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<BindableViewHolder<Item<PayloadType>>> {
+class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<BindableViewHolder<PayloadType>> {
 
     private Kryo kryo = new Kryo();
     private List<Item<PayloadType>> items = new ArrayList<>();
@@ -30,11 +30,12 @@ class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<Bind
         setEmptyViewBinder(new ItemViewBinderEmpty());
     }
 
-    private ItemViewBinder defaultViewBinder = new ItemViewBinderString();
+    private ItemViewBinder<PayloadType> defaultViewBinder = new ItemViewBinderString<>();
+    private ItemViewBinder<PayloadType> footer = new ItemViewBinderFooter<>();
 
     private SparseArray<ItemViewBinder<PayloadType>> itemViewBinderMap =
             new SparseArray<ItemViewBinder<PayloadType>>() {{
-        put(ItemViewBinderFooter.FOOTER_TYPE, new ItemViewBinderFooter());
+        put(ItemViewBinderFooter.FOOTER_TYPE, footer);
     }};
 
     void setEmptyViewBinder(@NonNull EmptyViewBinder emptyViewBinder) {
@@ -68,7 +69,7 @@ class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<Bind
     }
 
     @Override
-    public BindableViewHolder<Item<PayloadType>> onCreateViewHolder(@NonNull ViewGroup parent,
+    public BindableViewHolder<PayloadType> onCreateViewHolder(@NonNull ViewGroup parent,
                                                            int viewType) {
         if (viewType == ItemViewBinderEmpty.EMPTY_TYPE) {
             return new BindableViewHolder<>(parent, emptyViewBinder);
@@ -80,7 +81,7 @@ class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<Bind
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BindableViewHolder<Item<PayloadType>> holder, int position) {
+    public void onBindViewHolder(@NonNull BindableViewHolder<PayloadType> holder, int position) {
         if (position == items.size()) {
             return;  // nothing to bind
         }

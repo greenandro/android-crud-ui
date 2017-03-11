@@ -53,7 +53,7 @@ public class SelectableItemList<PayloadType extends Payload> extends FrameLayout
     }
 
     public void registerItemViewBinder(Enum itemType,
-                                       ItemViewBinder<Item<SelectablePayload<PayloadType>>> itemViewBinder) {
+                                       ItemViewBinder<SelectablePayload<PayloadType>> itemViewBinder) {
         itemList.registerItemViewBinder(itemType, itemViewBinder);
     }
 
