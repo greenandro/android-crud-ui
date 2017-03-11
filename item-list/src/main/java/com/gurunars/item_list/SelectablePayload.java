@@ -3,10 +3,11 @@ package com.gurunars.item_list;
 final class SelectablePayload<PayloadType extends Payload> implements Payload {
 
     private final PayloadType payload;
-    private boolean selected = false;
+    private boolean selected;
 
-    SelectablePayload(PayloadType payload) {
+    SelectablePayload(PayloadType payload, boolean selected) {
         this.payload = payload;
+        this.selected = selected;
     }
 
     public final boolean isSelected() {
