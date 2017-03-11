@@ -40,4 +40,9 @@ final class SelectablePayload<PayloadType extends Payload> implements Payload {
     public Enum getType() {
         return payload.getType();
     }
+
+    @Override
+    public String toString() {
+        return payload + "|" + selected;
+    }
 }
