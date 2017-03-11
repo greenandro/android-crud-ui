@@ -66,12 +66,12 @@ class CollectionManager<PayloadType extends Payload> implements Serializable {
     }
 
     void setItems(List<Item<PayloadType>> items) {
-        this.items = kryo.copy(items);
+        this.items = kryo.copy(new ArrayList<>(items));
         changed();
     }
 
     void setSelectedItems(Set<Item<PayloadType>> selectedItems) {
-        this.selectedItems = kryo.copy(selectedItems);
+        this.selectedItems = kryo.copy(new HashSet<>(selectedItems));
         changed();
     }
 

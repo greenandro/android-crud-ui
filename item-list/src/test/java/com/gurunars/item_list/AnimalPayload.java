@@ -28,4 +28,13 @@ class AnimalPayload implements Payload {
     public String toString() {
         return "" + type + " @ " + version;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AnimalPayload) {
+            AnimalPayload other = (AnimalPayload) obj;
+            return version == other.version && type == other.type;
+        }
+        return false;
+    }
 }
