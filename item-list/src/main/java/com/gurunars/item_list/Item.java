@@ -40,4 +40,9 @@ public final class Item<PayloadType extends Serializable> implements Serializabl
     public final int hashCode() {
         return Long.valueOf(getId()).hashCode();
     }
+
+    @Override
+    public final String toString() {
+        return "#" + id + "{" + payload.toString() + "}";
+    }
 }
