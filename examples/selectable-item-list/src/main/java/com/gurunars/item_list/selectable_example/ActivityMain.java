@@ -16,8 +16,9 @@ import android.widget.Toast;
 
 import com.gurunars.item_list.EmptyViewBinder;
 import com.gurunars.item_list.Item;
-import com.gurunars.item_list.ItemList;
 import com.gurunars.item_list.ItemViewBinder;
+import com.gurunars.item_list.SelectableItemList;
+import com.gurunars.item_list.SelectablePayload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import butterknife.ButterKnife;
 
 public class ActivityMain extends AppCompatActivity {
 
-    static class AnimalBinder implements ItemViewBinder<AnimalPayload> {
+    static class AnimalBinder implements ItemViewBinder<SelectablePayload<AnimalPayload>> {
 
         @Override
         public View getView(Context context) {
@@ -38,7 +39,7 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         @Override
-        public void bind(View itemView, Item<AnimalPayload> item, @Nullable Item<AnimalPayload> previousItem) {
+        public void bind(View itemView, Item<SelectablePayload<AnimalPayload>> item, @Nullable Item<SelectablePayload<AnimalPayload>> previousItem) {
             ((TextView) itemView).setText(item.getId() + " [" +
                     item.getPayload().getType().name().toLowerCase() + "]");
             if (previousItem != null) {
@@ -74,7 +75,7 @@ public class ActivityMain extends AppCompatActivity {
 
     }
 
-    private ItemList<AnimalPayload> itemList;
+    private SelectableItemList<AnimalPayload> itemList;
     private List<Item<AnimalPayload>> items = new ArrayList<>();
     private int count = 0;
 

@@ -1,6 +1,6 @@
 package com.gurunars.item_list;
 
-final class SelectablePayload<PayloadType extends Payload> implements Payload {
+public final class SelectablePayload<PayloadType extends Payload> implements Payload {
 
     private final PayloadType payload;
     private boolean selected;
