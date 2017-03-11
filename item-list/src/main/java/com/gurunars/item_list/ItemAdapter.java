@@ -30,11 +30,11 @@ class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<Bind
         setEmptyViewBinder(new ItemViewBinderEmpty());
     }
 
-    private ItemViewBinder<Item<PayloadType>> defaultViewBinder = new ItemViewBinderString<>();
+    private ItemViewBinder defaultViewBinder = new ItemViewBinderString();
 
-    private SparseArray<ItemViewBinder<Item<PayloadType>>> itemViewBinderMap =
-            new SparseArray<ItemViewBinder<Item<PayloadType>>>() {{
-        put(ItemViewBinderFooter.FOOTER_TYPE, new ItemViewBinderFooter<Item<PayloadType>>());
+    private SparseArray<ItemViewBinder<PayloadType>> itemViewBinderMap =
+            new SparseArray<ItemViewBinder<PayloadType>>() {{
+        put(ItemViewBinderFooter.FOOTER_TYPE, new ItemViewBinderFooter());
     }};
 
     void setEmptyViewBinder(@NonNull EmptyViewBinder emptyViewBinder) {
@@ -42,7 +42,7 @@ class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<Bind
     }
 
     void registerItemViewBinder(@NonNull Enum anEnum,
-                                @NonNull ItemViewBinder<Item<PayloadType>> itemViewBinder) {
+                                @NonNull ItemViewBinder<PayloadType> itemViewBinder) {
         itemViewBinderMap.put(anEnum.ordinal(), itemViewBinder);
     }
 
@@ -73,9 +73,9 @@ class ItemAdapter<PayloadType extends Payload> extends RecyclerView.Adapter<Bind
         if (viewType == ItemViewBinderEmpty.EMPTY_TYPE) {
             return new BindableViewHolder<>(parent, emptyViewBinder);
         } else {
-            ItemViewBinder<Item<PayloadType>> itemViewBinder = this.itemViewBinderMap.get(viewType);
-            return new BindableViewHolder<>(parent, itemViewBinder != null ?
-                    itemViewBinder : defaultViewBinder);
+            ItemViewBinder<PayloadType> itemViewBinder = this.itemViewBinderMap.get(viewType);
+            return new BindableViewHolder<>(parent, itemViewBinder == null ? defaultViewBinder :
+                    itemViewBinder);
         }
     }
 

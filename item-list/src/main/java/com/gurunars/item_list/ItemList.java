@@ -74,7 +74,7 @@ public class ItemList<PayloadType extends Payload> extends FrameLayout {
      * @param itemType type of the Item
      * @param itemViewBinder renderer for the items of a given type
      */
-    public void registerItemViewBinder(Enum itemType, ItemViewBinder<Item<PayloadType>> itemViewBinder) {
+    public void registerItemViewBinder(Enum itemType, ItemViewBinder<PayloadType> itemViewBinder) {
         itemAdapter.registerItemViewBinder(itemType, itemViewBinder);
     }
 
